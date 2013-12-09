@@ -50,6 +50,7 @@ public class FlipCards {
   private boolean orientationVertical = true;
   private float lastPosition = -1;
 	private float startY = -1;
+	private float startX = -1;
   private FlipViewController controller;
 
   private volatile boolean visible = false;
@@ -280,14 +281,18 @@ public class FlipCards {
         lastPageIndex = getPageIndexFromAngle(accumulatedAngle);
         lastPosition = orientationVertical ? event.getY() : event.getX();
 			startY = event.getY();
+			startX=event.getX();
         return isOnTouchEvent;
       case MotionEvent.ACTION_MOVE:
         float
             delta =
             orientationVertical ? (lastPosition - event.getY()) : (lastPosition - event.getX());
-			if (Math.abs(startY - event.getY()) - Math.abs(delta) > 50) {
+			float diffX = Math.abs(startX - event.getX());
+			float diffY = Math.abs(startY - event.getY());
+			if (diffX < diffY) {
 				return false;
 			}
+
         if (Math.abs(delta) > controller.getTouchSlop()) {
           setState(STATE_TOUCH);
           forward = delta > 0;

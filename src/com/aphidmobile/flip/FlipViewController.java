@@ -17,6 +17,7 @@ limitations under the License.
 
 package com.aphidmobile.flip;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import junit.framework.Assert;
@@ -91,7 +92,9 @@ public class FlipViewController extends AdapterView<Adapter> {
   private DataSetObserver adapterDataObserver;
 
   private final LinkedList<View> bufferedViews = new LinkedList<View>();
-  private final LinkedList<View> releasedViews = new LinkedList<View>(); //XXX: use a SparseArray to keep the related view indices?
+	private final LinkedList<View> releasedViews = new LinkedList<View>();
+	private final HashMap<Integer, View> countViews = new HashMap<Integer, View>();
+	// XXX: use a SparseArray to keep the related view indices?
   private int bufferIndex = -1;
   private int adapterIndex = -1;
   private final int sideBufferSize = 1;
@@ -457,7 +460,10 @@ public class FlipViewController extends AdapterView<Adapter> {
 
     View releasedView = releasedViews.isEmpty() ? null : releasedViews.removeFirst();
 
-    View view = adapter.getView(position, releasedView, this);
+		// View view = adapter.getView(position, releasedView, this);
+		View view = adapter.getView(position, countViews.get(position), this);
+
+		countViews.put(position, view);
     if (releasedView != null && view != releasedView) {
       addReleasedView(releasedView);
     }
