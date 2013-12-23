@@ -597,7 +597,30 @@ public class FlipViewController extends AdapterView<Adapter> {
       });
     }
   }
+  void postHideFlipAnimation2() {
+		if (inFlipAnimation) {
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					hideFlipAnimation2();
+				}
+			});
+		}
+	}
 
+	private void hideFlipAnimation2() {
+		if (inFlipAnimation) {
+			inFlipAnimation = false;
+
+			updateVisibleView(bufferIndex);
+
+			if (onViewFlipListener != null) {
+				onViewFlipListener.onViewFlipped(
+						bufferedViews.get(bufferIndex), adapterIndex);
+			}
+
+		}
+	}
   private void onDataChanged() {
     adapterDataCount = adapter.getCount();
     int activeIndex;

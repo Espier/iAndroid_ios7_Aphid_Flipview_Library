@@ -38,6 +38,7 @@ public class FlipCards {
   private static final int STATE_INIT = 0;
   private static final int STATE_TOUCH = 1;
   private static final int STATE_AUTO_ROTATE = 2;
+  private static final int AUTO_TO_INIT = 3;
 
   private ViewDualCards frontCards;
   private ViewDualCards backCards;
@@ -170,6 +171,7 @@ public class FlipCards {
     }
 
     switch (state) {
+      case AUTO_TO_INIT:
       case STATE_INIT:
       case STATE_TOUCH:
         break;
@@ -185,14 +187,14 @@ public class FlipCards {
           Assert.assertTrue(forward);
           if (accumulatedAngle >= 0) {
             accumulatedAngle = 0;
-            setState(STATE_INIT);
+            setState(AUTO_TO_INIT);
           }
         } else {
           if (frontCards.getIndex() == maxIndex - 1 && oldAngle > frontCards.getIndex()
                                                                   * 180) { //bouncing back after flip forward and over the last page
             Assert.assertTrue(!forward);
             if (accumulatedAngle <= frontCards.getIndex() * 180) {
-              setState(STATE_INIT);
+            	setState(AUTO_TO_INIT);
               accumulatedAngle = frontCards.getIndex() * 180;
             }
           } else {
@@ -202,7 +204,7 @@ public class FlipCards {
                   backCards.getIndex() != -1);
               if (accumulatedAngle >= backCards.getIndex() * 180) { //moved to the next page
                 accumulatedAngle = backCards.getIndex() * 180;
-                setState(STATE_INIT);
+                setState(AUTO_TO_INIT);
                 controller.postFlippedToView(backCards.getIndex());
 
                 swapCards();
@@ -211,7 +213,7 @@ public class FlipCards {
             } else { //backward
               if (accumulatedAngle <= frontCards.getIndex() * 180) { //firstCards restored
                 accumulatedAngle = frontCards.getIndex() * 180;
-                setState(STATE_INIT);
+                setState(AUTO_TO_INIT);
               }
             }
           }
@@ -219,7 +221,10 @@ public class FlipCards {
 
         if (state == STATE_INIT) {
           controller.postHideFlipAnimation();
-        } else {
+        } else if(state == AUTO_TO_INIT){
+			controller.postHideFlipAnimation2();
+			setVisible(false);
+		}else {
           controller.getSurfaceView().requestRender();
         }
       }
